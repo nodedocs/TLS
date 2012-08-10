@@ -20,27 +20,28 @@ TLS support in node is relatively new. The first stable version of node.js to su
 
 In most ways, the tls module's server api is similar to that of the "net" module. Besides the fact that it's for encrypted connections, the major difference is that the options object passed to `tls.connect` or `tls.createServer` needs to include information on both the private key and the certificate, in [pem format](http://en.wikipedia.org/wiki/X.509#Certificate_filename_extensions). Here's an example of a tls server:
 
-    var tls = require('tls'),
-        fs = require('fs'),
-        colors = require('colors'),
-        msg = [
-                ".-..-..-.  .-.   .-. .--. .---. .-.   .---. .-.",
-                ": :; :: :  : :.-.: :: ,. :: .; :: :   : .  :: :",
-                ":    :: :  : :: :: :: :: ::   .': :   : :: :: :",
-                ": :: :: :  : `' `' ;: :; :: :.`.: :__ : :; ::_;",
-                ":_;:_;:_;   `.,`.,' `.__.':_;:_;:___.':___.':_;" 
-              ].join("\n").cyan;
+```javascript
+var tls = require('tls'),
+  fs = require('fs'),
+  colors = require('colors'),
+  msg = [
+          ".-..-..-.  .-.   .-. .--. .---. .-.   .---. .-.",
+          ": :; :: :  : :.-.: :: ,. :: .; :: :   : .  :: :",
+          ":    :: :  : :: :: :: :: ::   .': :   : :: :: :",
+          ": :: :: :  : `' `' ;: :; :: :.`.: :__ : :; ::_;",
+          ":_;:_;:_;   `.,`.,' `.__.':_;:_;:___.':___.':_;" 
+        ].join("\n").cyan;
 
-    var options = {
-      key: fs.readFileSync('private-key.pem'),
-      cert: fs.readFileSync('public-cert.pem')
-    };
+var options = {
+  key: fs.readFileSync('private-key.pem'),
+  cert: fs.readFileSync('public-cert.pem')
+};
 
-    tls.createServer(options, function (s) {
-      s.write(msg+"\n");
-      s.pipe(s);
-    }).listen(8000);
-
+tls.createServer(options, function (s) {
+  s.write(msg+"\n");
+  s.pipe(s);
+}).listen(8000);
+```
 
 In this example, a "hello world" tls server is created, listening on port 8000. The options object includes two properties: `key` and `cert`. The contents of these properties come directly from the private key and public certificate stored on the filesystem. In this case they are binary buffers, but the tls module can also accept unicode strings.
 
@@ -104,29 +105,31 @@ You should see a bunch of output regarding the handshaking process, and then at 
 
 The "tls" module also supplies tools for connecting to such a server:
 
-    var tls = require('tls'),
-        fs = require('fs');
+```javascript
+var tls = require('tls'),
+    fs = require('fs');
 
-    var options = {
-      key: fs.readFileSync('private-key.pem'),
-      cert: fs.readFileSync('public-cert.pem')
-    };
+var options = {
+  key: fs.readFileSync('private-key.pem'),
+  cert: fs.readFileSync('public-cert.pem')
+};
 
-    var conn = tls.connect(8000, options, function() {
-      if (conn.authorized) {
-        console.log("Connection authorized by a Certificate Authority.");
-      } else {
-        console.log("Connection not authorized: " + conn.authorizationError)
-      }
-        console.log();
-    });
+var conn = tls.connect(8000, options, function() {
+  if (conn.authorized) {
+    console.log("Connection authorized by a Certificate Authority.");
+  } else {
+    console.log("Connection not authorized: " + conn.authorizationError)
+  }
+    console.log();
+});
 
 
 
-    conn.on("data", function (data) {
-      console.log(data.toString());
-      conn.end();
-    });
+conn.on("data", function (data) {
+  console.log(data.toString());
+  conn.end();
+});
+```
 
 The idea is similar, except instead of creating a server, this script connects to one instead. `tls.connect` also takes an options object, but then returns a stream.
 
